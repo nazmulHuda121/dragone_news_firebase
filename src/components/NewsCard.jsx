@@ -1,4 +1,4 @@
-import { FaEye, FaStar, FaShareAlt, FaRegBookmark } from "react-icons/fa";
+import { FaEye, FaStar, FaShareAlt, FaRegBookmark } from 'react-icons/fa';
 
 const NewsCard = ({ news }) => {
   const { title, author, thumbnail_url, details, rating, total_view } = news;
@@ -19,6 +19,7 @@ const NewsCard = ({ news }) => {
           </div>
           <div>
             <h2 className="font-bold text-sm">{author.name}</h2>
+
             <p className="text-xs text-gray-500">{formattedDate}</p>
           </div>
         </div>
