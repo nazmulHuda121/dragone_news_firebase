@@ -1,23 +1,33 @@
-import { use } from 'react';
-import { Link } from 'react-router';
+import { use, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../Provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const { logInUser } = use(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  // console.log(location);
+
   const handleLogInUser = (e) => {
     e.preventDefault();
     console.log(e.target);
     const email = e.target.email.value;
     const password = e.target.password.value;
 
+    // console.log(location);
+
     logInUser(email, password)
       .then((res) => {
         const user = res.user;
         console.log(user);
-        alert('Login Succesfully Complete');
+        toast('Login Succesfully Complete');
+        navigate(`${location.state ? location.state : '/'}`);
       })
       .catch((error) => {
-        console.log(error);
+        const errorCode = error.code;
+        setError(errorCode);
       });
   };
 
@@ -36,6 +46,7 @@ const Login = () => {
               type="email"
               className="input"
               placeholder="Email"
+              required
             />
             <label className="label">Password</label>
             <input
@@ -43,10 +54,12 @@ const Login = () => {
               type="password"
               className="input"
               placeholder="Password"
+              required
             />
             <div>
               <a className="link link-hover">Forgot password?</a>
             </div>
+            {error && <p className="text-red-400 text-xs">{error}</p>}
             <button className="btn btn-neutral mt-4">Login</button>
           </fieldset>
         </form>

@@ -1,28 +1,53 @@
-import { use } from 'react';
-import { Link } from 'react-router';
+import { use, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../Provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const Register = () => {
-  const { createUser } = use(AuthContext);
+  const { createUser, setUser, updateUser } = use(AuthContext);
+  const [nameError, setNameError] = useState('');
+  const [passError, setPassError] = useState('');
+  const navigate = useNavigate();
   const handleRegisterUser = (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
+    if (name.length < 5) {
+      setNameError('Name should be more than 5 Charecter');
+      return;
+    } else {
+      setNameError('');
+    }
     const photo = form.photo.value;
     const email = form.email.value;
     const password = form.password.value;
+    if (password.length < 5) {
+      setPassError('Password at least 6 charecter require');
+      return;
+    } else {
+      setPassError('');
+    }
 
     console.log({ name, photo, email, password });
 
     createUser(email, password)
       .then((res) => {
         const user = res.user;
-        console.log(user);
+        updateUser({ displayName: name, photoURL: photo })
+          .then(() => {
+            setUser({ ...user, displayName: name, photoURL: photo });
+            navigate('/');
+          })
+          .catch((error) => {
+            console.log(error);
+            setUser(user);
+          });
+        toast('Registation Complete');
       })
       .catch((error) => {
         // const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorMessage);
+        toast(errorMessage);
       });
   };
   return (
@@ -41,7 +66,9 @@ const Register = () => {
                 type="text"
                 className="input"
                 placeholder="Enter your name"
+                required
               />
+              {nameError && <p className="text-red-300 text-xs">{nameError}</p>}
               <label className="label">Photo URL</label>
               {/* Photo URL */}
               <input
@@ -49,6 +76,7 @@ const Register = () => {
                 type="text"
                 className="input"
                 placeholder="Photo URL"
+                required
               />
               <label className="label">Email</label>
               <input
@@ -56,6 +84,7 @@ const Register = () => {
                 type="email"
                 className="input"
                 placeholder="Email"
+                required
               />
               <label className="label">Password</label>
               <input
@@ -63,7 +92,9 @@ const Register = () => {
                 type="password"
                 className="input"
                 placeholder="Password"
+                required
               />
+              {passError && <p className="text-red-400 text-xs">{passError}</p>}
               <div>
                 <a className="link link-hover">Forgot password?</a>
               </div>
